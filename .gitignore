@@ -1,0 +1,18 @@
+# Build settings
+bin/
+build/
+.gradle/
+.settings/
+.project
+.classpath
+
+# IDE-specific
+.idea/
+.vscode/
+.kateproject
+
+# Helpers
+config
+.env
+scripts
+.DS_Store

@@ -1,0 +1,10 @@
+{
+  "name": "player-vs-player",
+  "displayName": "PLayerVsPlayer",
+  "description": "The official PlayerVsPlayer server plugin. Custom interactions with both a connecting client and the betting contract",
+  "version": "0.1",
+  "minGameVersion": "146",
+  "author": "0xPuddi",
+  "java": true,
+  "main": "PlayerVsPlayer.PlayerVsPlayer"
+}

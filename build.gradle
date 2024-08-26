@@ -1,0 +1,91 @@
+plugins{
+    id 'java'
+}
+
+configure(allprojects){
+    sourceSets.main.java.srcDirs = [layout.projectDirectory.dir('src')]
+
+    ext{
+        compilerVersion = JavaVersion.current().ordinal() - JavaVersion.VERSION_17.ordinal() + 17
+        useJitpack = Boolean.valueOf(mindustryBE)
+
+        arc = {String module ->
+            return "com.github.Anuken.Arc$module:$arcVersion"
+        }
+
+        mindustry = {String module ->
+            return "com.github.Anuken.Mindustry$module:$mindustryVersion"
+        }
+    }
+
+    configurations.configureEach{
+        // Resolve the correct Mindustry dependency, and force Arc version.
+        resolutionStrategy.eachDependency{
+            if(useJitpack && requested.group == 'com.github.Anuken.Mindustry'){
+                useTarget "com.github.Anuken.MindustryJitpack:$it.requested.name:$mindustryBEVersion"
+            }
+
+            if(requested.group == 'com.github.Anuken.Arc'){
+                useVersion arcVersion
+            }
+        }
+    }
+
+    repositories{
+        // Necessary Maven repositories to pull dependencies from.
+        mavenCentral()
+        maven{url 'https://oss.sonatype.org/content/repositories/snapshots/'}
+        maven{url 'https://oss.sonatype.org/content/repositories/releases/'}
+
+        // Use Zelaux's non-buggy repository for release Mindustry and Arc builds.
+        if(!useJitpack) maven{url 'https://raw.githubusercontent.com/Zelaux/MindustryRepo/master/repository'}
+        maven{url 'https://jitpack.io'}
+    }
+
+    tasks.withType(JavaCompile).configureEach{
+        // Use Java 17+ syntax, but target Java 8 bytecode version.
+        sourceCompatibility = compilerVersion
+        options.release.set 8
+        options.compilerArgs << '-Xlint:-options'
+
+        options.incremental = true
+        options.encoding = 'UTF-8'
+    }
+}
+
+configure(rootProject){
+    dependencies{
+        // Depend on Mindustry/Arc classpath.
+        compileOnly "${mindustry(':core')}"
+        compileOnly "${arc(':arc-core')}"
+        compileOnly "com.github.Anuken.Mindustry:server:" + property("mindustryVersion")
+
+        implementation "org.web3j:core:4.9.8"
+        implementation "io.github.cdimascio:dotenv-java:3.0.0"
+    }
+
+    jar{
+        archiveFileName = "${pluginName}.jar"
+
+        // Deliberately check if the mod meta is actually written in HJSON, since, well, some people actually use it.
+        // But this is also not mentioned in the `README.md`, for the mischievous reason of driving beginners into using
+        // JSON instead.
+        def metaJson = layout.projectDirectory.file('plugin.json')
+        def metaHjson = layout.projectDirectory.file('plugin.hjson')
+        if(metaJson.asFile.exists() && metaHjson.asFile.exists()){
+            throw new GradleException('Ambiguous mod meta: both `plugin.json` and `plugin.hjson` exist.')
+        }else if(!metaJson.asFile.exists() && !metaHjson.asFile.exists()){
+            throw new GradleException('Missing mod meta: neither `plugin.json` nor `plugin.hjson` exist.')
+        }
+        def isJson = metaJson.asFile.exists()
+
+        from files(sourceSets.main.output.classesDirs)
+        from files(sourceSets.main.output.resourcesDir)
+        from configurations.runtimeClasspath.collect{it.isDirectory() ? it : zipTree(it)}
+
+        from isJson ? metaJson : metaHjson
+
+        exclude("META-INF/*.RSA", "META-INF/*.DSA", "META-INF/*.SF")
+        duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+    }
+}
