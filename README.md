@@ -29,7 +29,7 @@ make gbuild
 or 
 
 ```sh
-make gbuild
+./gradlew jar
 ```
 
 The build will be packed into a `.jar` file at `./build/libs/PluginTemplate.jar`.
