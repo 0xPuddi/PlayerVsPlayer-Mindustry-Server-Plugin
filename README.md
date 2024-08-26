@@ -36,8 +36,6 @@ The build will be packed into a `.jar` file at `./build/libs/PluginTemplate.jar`
 
 To use the plugin inside a Mindustry server you will need to insert the jar file inside `./config/mods` based on where you are running the server script. As in the `.env.example` file you will need a private key for a server controlled wallet that should be also the same that deployed the Smart Contract as it will run some admin related function to manage the game. Yes it is a server-centralized architecture, there are decentralized architectures being developed right now and they should be used for production grade applications, sadly majority of GameFi still runs on this centralized architecture.
 
-Note that the jar file inside `./requirements` is needed to check if the client has the right plugin installed to be able to connect to the server
-
 ### GlennFolker Template docs
 Before going into using this template, be aware that a fair amount of Java knowledge and Git *(GitHub Desktop is fine, but `git` CLI is a million times better)* is **highly beneficial**. Going in blind isn't impossible, but you'll face a lot of problems. Not that people on [the Discord](https://discord.gg/mindustry) won't help, though, so be communicative!
 
