@@ -23,13 +23,13 @@ For a better deep dive you can find the whole plugin logic inside `./src/PlayerV
 To build the project either run
 
 ```sh
-make gbuild:
+make gbuild
 ```
 
 or 
 
 ```sh
-make gbuild:
+make gbuild
 ```
 
 The build will be packed into a `.jar` file at `./build/libs/PluginTemplate.jar`.
